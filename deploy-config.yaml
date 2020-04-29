@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-configmap
+data:
+  keycloak.user: admin
+  db.database: keycloak
+  db.schema: keycloak
+  db.user: keycloakuser
+  db.addr: "172.17.0.1"
+  db.port: "3306"
+  db.vendor: mysql

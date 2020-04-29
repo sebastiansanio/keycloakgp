@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-deployment
+  labels:
+    app: keycloak
+spec:
+  selector:
+    matchLabels:
+      app: keycloak
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: sebastiansanio/keycloakgp:1.0.4
+        ports:
+        - containerPort: 80
+        env:
+        - name: KEYCLOAK_USER
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-configmap
+              key: keycloak.user
+        - name: KEYCLOAK_PASSWORD
+          valueFrom:
+             secretKeyRef:
+               name: keycloak-passwords
+               key: admin-password
+        - name: DB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-configmap
+              key: db.database
+        - name: DB_SCHEMA
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-configmap
+              key: db.schema
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-configmap
+              key: db.user
+        - name: DB_PASSWORD
+          valueFrom:
+             secretKeyRef:
+               name: keycloak-passwords
+               key: db-password
+        - name: DB_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-configmap
+              key: db.addr
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-configmap
+              key: db.port
+        - name: DB_VENDOR
+          valueFrom:
+            configMapKeyRef:
+              name: keycloak-configmap
+              key: db.vendor
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: "500m"
+          requests:
+            memory: 256Mi
+            cpu: "160m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+spec:
+  selector:
+    app: keycloak
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30081
+  type: NodePort
+---
+apiVersion: networking.k8s.io/v1beta1 # for versions before 1.14 use extensions/v1beta1
+kind: Ingress
+metadata:
+  name: keycloak-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: keycloakgp.globalprocessing.com.ar
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          serviceName: keycloak
+          servicePort: 8080  
+  
