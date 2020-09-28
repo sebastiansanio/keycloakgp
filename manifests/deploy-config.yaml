@@ -6,7 +6,7 @@ data:
   keycloak.user: admin
   db.database: keycloak
   db.schema: keycloak
-  db.user: keycloakuser
-  db.addr: "172.17.0.1"
+  db.user: keycloak
+  db.addr: "keycloak.c7cxambo972t.sa-east-1.rds.amazonaws.com"
   db.port: "3306"
   db.vendor: mysql

@@ -1,24 +1,37 @@
 ¿Cómo buildear el Dockerfile?
 ==========
-docker build -t gp/keycloak:1.0.0 .
+`docker build -t keycloak-gp:${IMAGE_VERSION} .`
 
 ¿Cómo correrlo de forma local?
 ===========
-docker run -p 8080:8080 -p 8443:8443 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -e DB_DATABASE=keycloak -e DB_SCHEMA=keycloak -e DB_USER=keycloakuser -e DB_PASSWORD=Hewe2112 -e DB_ADDR=172.17.0.1 -e DB_PORT=3306 -e DB_VENDOR=mysql gp/keycloak:1.0.6
+```
+docker run keycloak-gp:${IMAGE_VERSION} -p 8080:8080 -p 8443:8443 \
+  -e KEYCLOAK_USER=admin \
+  -e KEYCLOAK_PASSWORD=admin \
+  -e DB_DATABASE=keycloak \
+  -e DB_SCHEMA=keycloak \
+  -e DB_USER=keycloakuser \
+  -e DB_PASSWORD=Hewe2112 \
+  -e DB_ADDR=172.17.0.1 \
+  -e DB_PORT=3306 \
+  -e DB_VENDOR=mysql
+```
 
 Login local: http://localhost:8080/auth/realms/gp/account
 
 ¿Cómo pushear a Dockerhub?
 ===========
-docker login --username=yourhubusername
+```
+docker login --username=${DOCKERHUB_USER}
+docker tag ${IMAGE_ID} ${DOCKERHUB_USER}/keycloakgp:${IMAGE_VERSION}
+docker push ${DOCKERHUB_USER}/keycloakgp:${IMAGE_VERSION}
+```
 
-docker tag 7e7b9a4f59a2 sebastiansanio/keycloakgp:1.0.4
-docker push sebastiansanio/keycloakgp:1.0.4
+${IMAGE_ID}: ID de la imagen a subir (se obtiene desde "docker images" o al finalizar el build)
 
-7e7b9a4f59a2: ID del tag a subir (se obtiene desde "docker images")
-
-¿Cómo levantarlo en Kubernetes?
+¿Cómo instalar en Kubernetes?
 ===========
-kubectl apply -f deploy-secrets.yaml
-kubectl apply -f deploy-config.yaml
-kubectl apply -f deploy.yaml
+(Requiere helm v3 y kubectl)
+Ver o ejecutar:
+
+`./manifests/install.sh`
